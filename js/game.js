@@ -103,7 +103,6 @@ var Game = new function() {
 	}
 }
 var callLoadStage = function() {
-	//添加背景图层
 	backscene = new BackScene();
 	Game.addLayer(backscene);
 	Game.addLayer(Loader);
