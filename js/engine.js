@@ -17,7 +17,7 @@ var Lift = function() {
 	this.inPause = false
 	this.guideCount = 0
 	this.guideTimes = 0
-	this.guideOn=false
+	this.guideOn=true
 	this.continueGame = function() {
 		this.jumpUpCount = 0
 		this.trap.splice(0,1)
