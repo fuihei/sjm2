@@ -1,5 +1,5 @@
 var Loader = new function() {
-	var IMGS = 4,
+	var IMGS = 0,
 		ALL = IMGS;
 	var res_loaded = 0;
 	this.load = function(callNext) {
@@ -7,7 +7,7 @@ var Loader = new function() {
 		for (var i = 0; i < IMGS; i++) {
 			this.imgs[i] = new Image();
 		}
-		this.imgs[0].id = "title.png"; 
+		//this.imgs[0].id = "title.png"; 
 		for (var i = 0; i < IMGS; i++) {
 			this.imgs[i].src = "img/" + this.imgs[i].id;
 			this.imgs[i].onload = function() {
@@ -15,8 +15,9 @@ var Loader = new function() {
 			}
 		}
 		this.step = function(dt) {
-			if (res_loaded == ALL)
+			if (res_loaded == ALL){
 				callNext();
+			}				
 		}
 	}
 	this.draw = function(dt, ctx) {
@@ -25,8 +26,4 @@ var Loader = new function() {
 		ctx.font = base_font["17"];
 		ctx.fillText(CN ? ("加载进度：" + res_loaded + " / " + ALL) : ("loading:" + res_loaded + " / " + ALL), Game.width / 2, Game.height / 2);
 	}
-}
-var BackScene = function() {
-	this.step = function(dt) {}
-	this.draw = function(dt, ctx) {}
 }
