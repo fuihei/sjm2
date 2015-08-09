@@ -10,17 +10,17 @@ var Lift = function() {
 	this.trip = 0
 	this.lastTrip = -1
 	this.catTween = {}
-	this.jcEnergy = 50
+	this.jcEnergy = 20
 	this.jumpUpCount = 0
 	this.inFreeze = 0
-	this.detectRange = 60
+	this.detectRange = Game.width
 	this.inPause = false
 	this.guideCount = 0
 	this.guideTimes = 0
-	this.guideOn=true
+	this.guideOn = false
 	this.continueGame = function() {
 		this.jumpUpCount = 0
-		this.trap.splice(0,1)
+		this.trap.splice(0, 1)
 		this.cancelPause()
 	}
 	this.cancelPause = function() {
@@ -31,7 +31,7 @@ var Lift = function() {
 		if (this.guideCount > 1000 && this.guideTimes == 0) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击猫猫开始跳绳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击空白处开始跳绳") ? this.cancelPause() : this.cancelPause()
 		} else if (this.guideCount > 3000 & this.guideTimes == 1) {
 			this.inPause = true
 			this.guideTimes++
@@ -39,7 +39,7 @@ var Lift = function() {
 		} else if (this.guideCount > 6000 && this.guideTimes == 2) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击坑后面跳过坑") ? this.cancelPause() : this.cancelPause()
+				confirm("点击电梯往前跳") ? this.cancelPause() : this.cancelPause()
 		}
 	}
 	this.checkAccident = function() {
@@ -116,7 +116,12 @@ var Lift = function() {
 	}
 	this.checkJump = function() {
 		if (Game.touch.touched) {
-			if (Game.touch.X >= this.catX - 30 && Game.touch.X <= this.catX + 30 && Game.touch.Y <= this.catY + 40 && Game.touch.Y >= this.catY - 20) {
+			if (Game.touch.Y <= Game.touch.X * xyRatio + 0.5 * Game.height + 10 && Game.touch.Y >= Game.touch.X * xyRatio + 0.5 * Game.height - 10) {
+				if (!this.inJumpCross) {
+					Tween.clear.call(this.catTween)
+					this.catJumpCross(1, Game.touch.X - this.catX)
+				}
+			} else {
 				if (this.catTween.nowFrame >= 0.6 * this.catTween.plusAllFrame || !this.catTween.nowFrame) {
 					if (this.inFreeze == 0) {
 						Tween.clear.call(this.catTween)
@@ -127,11 +132,6 @@ var Lift = function() {
 					Tween.clear.call(this.catTween)
 					this.inFreeze = 1
 				}
-			} else {
-				if (!this.inJumpCross) {
-					Tween.clear.call(this.catTween)
-					this.catJumpCross(1, Game.touch.X - this.catX)
-				}
 			}
 			Game.touch.touched = false;
 			Game.touch.X = null;
@@ -141,9 +141,10 @@ var Lift = function() {
 	this.catJumpUp = function(time) {
 		Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -20, time)
 		Tween.create.call(this.catTween, "translate", 1, true, function() {}, "linear", 0, -20, 0, 0, time)
-		if (this.detectRange < Game.width) {
-			this.detectRange += 6
-		}
+//		if (this.detectRange < Game.width) {
+//			this.detectRange += 6
+//		}
+		this.jcEnergy+=5
 	}
 	this.catJumpCross = function(time, distance) {
 		//有多少能量，就能跳多远，v=2*s/t,a=-v/t
@@ -217,7 +218,7 @@ var Lift = function() {
 		ctx.textAlign = "center"
 		ctx.font = base_font["22b"]
 			//ctx.fillText("dist:" + Math.round(this.distance) + ";trip:" + this.trip + ";trap:" + this.trap, 0, 20)
-		ctx.fillText("神经猫2：电梯跳绳"+this.jumpUpCount + "次", 0.5 * Game.width, 0.1 * Game.height)
+		ctx.fillText("神经猫2：电梯跳绳" + this.jumpUpCount + "次", 0.5 * Game.width, 0.1 * Game.height)
 		ctx.lineWidth = 2
 		ctx.beginPath()
 		ctx.moveTo(0, this.liftLeftHeight)
@@ -234,9 +235,9 @@ var Lift = function() {
 			this.trapUnquip()
 			this.checkJump()
 			this.checkCoordinate(dt)
-			this.restoreEnergy(dt)
+			//this.restoreEnergy(dt)
 			this.checkFreeze(dt)
-			this.declineRange(dt)
+			//this.declineRange(dt)
 			this.adjustVisible()
 			this.checkAccident()
 			if (this.guideOn) {
