@@ -30,6 +30,9 @@ CN = (function() {
 function rndf(n) {
 	return Math.floor(Math.random() * n);
 }
+function rndc(n) {
+	return Math.ceil(Math.random() * n);
+}
 var Tween = {
 	//这里加参数，后面的arg裁减个数也要改
 	create: function(func, loop, dontOverride, callback) {

@@ -1,12 +1,14 @@
 var Lift = function() {
-	var speedX = 20
+	var speedX = 25
 	var mallLogos = ["华润万家", "屈臣氏", "正佳广场", "中信大厦", "万达广场"]
 	var xyRatio = 0.25
 	this.liftLeftHeight = 0.5 * Game.height
 	this.distance = 0
 	this.catX = 0.2 * Game.width
 	this.catY = this.liftLeftHeight + xyRatio * this.catX
-	this.trap = [-0.5 * Game.width]
+	this.trap = [
+		[-0.5 * Game.width, 20]
+	]
 	this.trip = 0
 	this.lastTrip = -1
 	this.catTween = {}
@@ -31,21 +33,21 @@ var Lift = function() {
 		if (this.guideCount > 1000 && this.guideTimes == 0) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击空白处开始跳绳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击空白处开始上下跳绳") ? this.cancelPause() : this.cancelPause()
 		} else if (this.guideCount > 3000 & this.guideTimes == 1) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("跳可以检查前面范围电梯是否有坑") ? this.cancelPause() : this.cancelPause()
+				confirm("跳神可以积攒能量") ? this.cancelPause() : this.cancelPause()
 		} else if (this.guideCount > 6000 && this.guideTimes == 2) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击电梯往前跳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击电梯消耗能量往前跳") ? this.cancelPause() : this.cancelPause()
 		}
 	}
 	this.checkAccident = function() {
 		for (var i = 0, length = this.trap.length; i < length; i++) {
-			var trapX = Game.width + this.trap[i] - this.distance
-			if (this.catX >= trapX && this.catX <= trapX + 40 && !this.inJumpCross) {
+			var trapX = Game.width + this.trap[i][0] - this.distance
+			if (this.catX >= trapX && this.catX <= trapX + this.trap[i][1] && !this.inJumpCross) {
 				Tween.clear.call(this.catTween)
 				Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, 0.5 * Game.height, 1)
 				this.inPause = true
@@ -122,10 +124,11 @@ var Lift = function() {
 					this.catJumpCross(1, Game.touch.X - this.catX)
 				}
 			} else {
-				if (this.catTween.nowFrame >= 0.6 * this.catTween.plusAllFrame || !this.catTween.nowFrame) {
+				if (this.catTween.nowFrame >= 0.5 * this.catTween.plusAllFrame || !this.catTween.nowFrame) {
 					if (this.inFreeze == 0) {
+						var distance=Math.floor(30*this.catTween.plusAllFrame/this.catTween.allFrame) 
 						Tween.clear.call(this.catTween)
-						this.catJumpUp(0.5)
+						this.catJumpUp(0.5,distance)
 						this.jumpUpCount++
 					}
 				} else {
@@ -138,13 +141,13 @@ var Lift = function() {
 			Game.touch.Y = null;
 		}
 	}
-	this.catJumpUp = function(time) {
-		Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -20, time)
-		Tween.create.call(this.catTween, "translate", 1, true, function() {}, "linear", 0, -20, 0, 0, time)
-//		if (this.detectRange < Game.width) {
-//			this.detectRange += 6
-//		}
-		this.jcEnergy+=5
+	this.catJumpUp = function(time,distance) {
+		Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -distance, time)
+		Tween.create.call(this.catTween, "translate", 1, true, function() {}, "linear", 0, -distance, 0, 0, time)
+			//		if (this.detectRange < Game.width) {
+			//			this.detectRange += 6
+			//		}
+		if (this.jcEnergy < 100) this.jcEnergy += 1
 	}
 	this.catJumpCross = function(time, distance) {
 		//有多少能量，就能跳多远，v=2*s/t,a=-v/t
@@ -158,13 +161,16 @@ var Lift = function() {
 	this.trapGenerator = function() {
 		if (this.trip != this.lastTrip) {
 			this.lastTrip = this.trip
-			this.trap.push(rndf(Game.width / 40) * 40 + Game.width * this.trip)
+			var part=rndc(2)
+			for (var i = 0; i < part; i++) {
+				this.trap.push([rndf(Game.width/part)+i*Math.floor(Game.width/part)+ Game.width * this.trip, 10 * rndc(1 + Math.min(10, this.trip))])
+			}
 		}
 	}
 	this.trapUnquip = function() {
-		for (var i = 0, length = this.trap.length; i < length; i++) {
-			var trapX = Game.width + this.trap[i] - this.distance
-			if (trapX < -40) {
+		for (var i = 0; i < this.trap.length; i++) {
+			var trapX = Game.width + this.trap[i][0] - this.distance
+			if (trapX < -this.trap[i][1]) {
 				this.trap.splice(i, 1)
 				i--
 			}
@@ -178,9 +184,9 @@ var Lift = function() {
 		ctx.strokeStyle = "red"
 		for (var i = 0, length = this.trap.length; i < length; i++) {
 			ctx.beginPath()
-			var trapX = Game.width + this.trap[i] - this.distance
+			var trapX = Game.width + this.trap[i][0] - this.distance
 			if (trapX < this.visibleWidth) {
-				var visibleTrapWidth = Math.min(40, this.visibleWidth - trapX)
+				var visibleTrapWidth = Math.min(this.trap[i][1], this.visibleWidth - trapX)
 				ctx.moveTo(trapX, trapX * xyRatio + this.liftLeftHeight)
 				ctx.lineTo(trapX + visibleTrapWidth, (trapX + visibleTrapWidth) * xyRatio + this.liftLeftHeight)
 				ctx.stroke()
@@ -192,13 +198,13 @@ var Lift = function() {
 	this.drawCat = function(ctx) {
 		ctx.save()
 		ctx.fillStyle = "black"
-		ctx.textAlign = "left"
+		ctx.textAlign = "center"
 		ctx.lineWidth = 5
 		ctx.strokeStyle = "black"
 		ctx.beginPath()
 		ctx.moveTo(this.catX, this.catY)
 		ctx.lineTo(this.catX, this.catY - 40)
-		ctx.fillText("猫", this.catX, this.catY - 50)
+		ctx.fillText("猫", this.catX, this.catY - 40)
 		ctx.stroke()
 		ctx.restore()
 	}
@@ -235,9 +241,9 @@ var Lift = function() {
 			this.trapUnquip()
 			this.checkJump()
 			this.checkCoordinate(dt)
-			//this.restoreEnergy(dt)
+				//this.restoreEnergy(dt)
 			this.checkFreeze(dt)
-			//this.declineRange(dt)
+				//this.declineRange(dt)
 			this.adjustVisible()
 			this.checkAccident()
 			if (this.guideOn) {
