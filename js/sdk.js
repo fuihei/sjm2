@@ -114,7 +114,7 @@ var Tween = {
 			this.frameEvents.translate.push(Tween[type](i, sx, ex - sx, this.allFrame));
 			this.frameEvents.translate.push(Tween[type](i, sy, ey - sy, this.allFrame));
 		}
-		Tween.addFrameByType.call(this, 4);
+		Tween.addFrameByType.call(this, 1);
 		//console.log(this.allFrame)
 	},
 	scale: function(type, sx, sy, begining, ending, duration) {
@@ -127,14 +127,22 @@ var Tween = {
 			//this.frameEvents.scale.push((1 - nowScale) * sx, (1 - nowScale) * sy);
 		}
 		//console.log(this.frameEvents.scale)
-		Tween.addFrameByType.call(this, 1);
+		Tween.addFrameByType.call(this, 2);
+	},
+	rotate: function(sx, sy, ex, ey,sAngle, eAngle, duration) {
+		this.allFrame = Math.round(duration * 1000 / loopIntervalAvg);
+		for (var i = 0; i < this.allFrame; i++) {
+			this.frameEvents.rotate.push(sAngle + i * (eAngle - sAngle) / this.allFrame,sx+i*(ex-sx)/this.allFrame,sy+i*(ey-sy)/this.allFrame);
+		}
+		Tween.addFrameByType.call(this, 3);
+		console.log(this.frameEvents)
 	},
 	alpha: function(st, et, duration) {
 		this.allFrame = Math.round(duration * 1000 / loopIntervalAvg);
 		for (var i = 0; i < this.allFrame; i++) {
 			this.frameEvents.globalAlpha.push(st + i * (et - st) / this.allFrame);
 		}
-		Tween.addFrameByType.call(this, 3);
+		Tween.addFrameByType.call(this, 4);
 	},
 	linear: function(t, b, c, d) {
 		//无缓动

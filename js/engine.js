@@ -2,17 +2,32 @@ var Lift = function() {
 	var speedX = 25
 	var mallLogos = ["华润万家", "屈臣氏", "正佳广场", "中信大厦", "万达广场"]
 	var xyRatio = 0.25
+	var xyAngle=Math.atan(xyRatio)
 	this.liftLeftHeight = 0.5 * Game.height
 	this.distance = 0
 	this.catX = 0.2 * Game.width
 	this.catY = this.liftLeftHeight + xyRatio * this.catX
+	var catMinHeight=20
+	var catMaxHeight=100
+	this.catH=catMinHeight
+	this.catTouch={
+		left:10,
+		right:10,
+		up:10,
+		down:10
+	}
+	catColor="black"
+	liftColor="grey"
+	var pressColor="red"
+	this.catColor=catColor
+	this.liftColor=liftColor
 	this.trap = [
 		[-0.5 * Game.width, 20]
 	]
 	this.trip = 0
 	this.lastTrip = -1
 	this.catTween = {}
-	this.jcEnergy = 20
+	//this.jcEnergy = 20
 	this.jumpUpCount = 0
 	this.inFreeze = 0
 	this.detectRange = Game.width
@@ -33,15 +48,17 @@ var Lift = function() {
 		if (this.guideCount > 1000 && this.guideTimes == 0) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击空白处开始上下跳绳") ? this.cancelPause() : this.cancelPause()
-		} else if (this.guideCount > 3000 & this.guideTimes == 1) {
+				confirm("点击神经猫，开始上下跳") ? this.cancelPause() : this.cancelPause()
+		} 
+//		else if (this.guideCount > 3000 & this.guideTimes == 1) {
+//			this.inPause = true
+//			this.guideTimes++
+//				confirm("跳神可以积攒能量") ? this.cancelPause() : this.cancelPause()
+//		} 
+		else if (this.guideCount > 3000 && this.guideTimes == 1) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("跳神可以积攒能量") ? this.cancelPause() : this.cancelPause()
-		} else if (this.guideCount > 6000 && this.guideTimes == 2) {
-			this.inPause = true
-			this.guideTimes++
-				confirm("点击电梯消耗能量往前跳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击电梯，开始左右跳") ? this.cancelPause() : this.cancelPause()
 		}
 	}
 	this.checkAccident = function() {
@@ -51,7 +68,7 @@ var Lift = function() {
 				Tween.clear.call(this.catTween)
 				Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, 0.5 * Game.height, 1)
 				this.inPause = true
-				setTimeout("confirm('神经猫跳了'+lift.jumpUpCount+'次'+'，继续不') ? lift.continueGame() :''", 1000)
+				PC?setTimeout("lift.continueGame()",1000):setTimeout("confirm('神经猫跳了'+lift.jumpUpCount+'次'+'，继续不') ? lift.continueGame() :''", 1000)
 			}
 		}
 	}
@@ -71,31 +88,30 @@ var Lift = function() {
 		ctx.restore()
 	}
 	this.declineRange = function(dt) {
-		if (this.detectRange > 30) {
-			this.detectRange -= dt / 200
-		}
-		if (this.detectRange < 30) {
-			this.detectRange = 20
-		}
-	}
-	this.drawEnergyBar = function(ctx) {
-		ctx.save()
-		ctx.fillStyle = "red"
-		ctx.textAlign = "left"
-		ctx.fillText("能量", 10, Game.height - 20)
-		ctx.strokeStyle = "red"
-		ctx.lineWidth = 5
-		ctx.beginPath()
-		ctx.moveTo(10, Game.height - 10)
-		ctx.lineTo(10 + 2 * this.jcEnergy, Game.height - 10)
-		ctx.stroke()
-		ctx.restore()
-	}
-	this.restoreEnergy = function(dt) {
-		if (this.jcEnergy <= 50) {
-			this.jcEnergy += dt / 200
+		if (this.catH < catMinHeight) {
+			this.catH  += dt / 200
+		}else{
+			this.catH  -= dt / 200
 		}
 	}
+//	this.drawEnergyBar = function(ctx) {
+//		ctx.save()
+//		ctx.fillStyle = "red"
+//		ctx.textAlign = "left"
+//		ctx.fillText("能量", 10, Game.height - 20)
+//		ctx.strokeStyle = "red"
+//		ctx.lineWidth = 5
+//		ctx.beginPath()
+//		ctx.moveTo(10, Game.height - 10)
+//		ctx.lineTo(10 + 2 * this.jcEnergy, Game.height - 10)
+//		ctx.stroke()
+//		ctx.restore()
+//	}
+//	this.restoreEnergy = function(dt) {
+//		if (this.jcEnergy <= 50) {
+//			this.jcEnergy += dt / 200
+//		}
+//	}
 	this.checkCoordinate = function(dt) {
 		if (this.inJumpCross) {
 			this.jcSpeed += this.jcAcc * dt / 1000
@@ -118,52 +134,59 @@ var Lift = function() {
 	}
 	this.checkJump = function() {
 		if (Game.touch.touched) {
-			if (Game.touch.Y <= Game.touch.X * xyRatio + 0.5 * Game.height + 10 && Game.touch.Y >= Game.touch.X * xyRatio + 0.5 * Game.height - 10) {
-				if (!this.inJumpCross) {
-					Tween.clear.call(this.catTween)
-					this.catJumpCross(1, Game.touch.X - this.catX)
-				}
-			} else {
+			var height = this.catTween.nowFrame ? Math.floor(30 * this.catTween.plusAllFrame / this.catTween.nowFrame) : 30
+			if (Game.touch.X >= this.catX - this.catTouch.left && Game.touch.X <= this.catX + this.catTouch.right && Game.touch.Y <= this.catY + this.catTouch.down && Game.touch.Y >= this.catY - this.catH-this.catTouch.up) {
+				this.catColor=pressColor
+				setTimeout("lift.catColor=catColor",200)
 				if (this.catTween.nowFrame >= 0.5 * this.catTween.plusAllFrame || !this.catTween.nowFrame) {
 					if (this.inFreeze == 0) {
-						var distance=Math.floor(30*this.catTween.plusAllFrame/this.catTween.allFrame) 
 						Tween.clear.call(this.catTween)
-						this.catJumpUp(0.5,distance)
+						this.catJumpUp(1, height)
 						this.jumpUpCount++
 					}
 				} else {
 					Tween.clear.call(this.catTween)
 					this.inFreeze = 1
 				}
+			} else {
+				this.liftColor=pressColor
+				setTimeout("lift.liftColor=liftColor",200)
+				if (!this.inJumpCross) {
+					Tween.clear.call(this.catTween)
+					this.catJumpCross(1, Game.touch.X - this.catX, height)
+				}
 			}
-			Game.touch.touched = false;
-			Game.touch.X = null;
-			Game.touch.Y = null;
+			Game.touch.touched = false
+			Game.touch.X = null
+			Game.touch.Y = null
 		}
 	}
-	this.catJumpUp = function(time,distance) {
-		Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -distance, time)
-		Tween.create.call(this.catTween, "translate", 1, true, function() {}, "linear", 0, -distance, 0, 0, time)
+	this.catJumpUp = function(time, height) {
+		Tween.create.call(this.catTween, "translate", 1, false, function() {}, "linear", 0, 0, 0, -height, time/2)
+		Tween.create.call(this.catTween, "translate", 1, true, function() {}, "linear", 0, -height, 0, 0, time/2)
 			//		if (this.detectRange < Game.width) {
 			//			this.detectRange += 6
 			//		}
-		if (this.jcEnergy < 100) this.jcEnergy += 1
+		if (this.catH < catMaxHeight) this.catH += 5
 	}
-	this.catJumpCross = function(time, distance) {
+	this.catJumpCross = function(time, distance, height) {
 		//有多少能量，就能跳多远，v=2*s/t,a=-v/t
 		this.inJumpCross = distance < 0 ? -1 : 1
-		var realDistance = Math.min(this.jcEnergy, Math.abs(distance))
-		this.jcEnergy -= realDistance
-		this.jcSpeed = 2 * this.inJumpCross * realDistance / time
+		var realDistance =this.inJumpCross*Math.min(this.catH, Math.abs(distance))
+		var catEndingX=this.catX+realDistance
+		var catEndingY=this.liftLeftHeight + xyRatio * catEndingX
+//		this.catH-= realDistance
+		this.jcSpeed = 2 * realDistance / time
 		this.jcAcc = -this.jcSpeed / time
-		this.catJumpUp(time)
+		Tween.create.call(this.catTween, "rotate", 1, false, function() {}, this.catX, this.catY, this.catX, this.catY, 0,Math.PI/2+ xyAngle,time/2)
+		Tween.create.call(this.catTween, "rotate", 1, true, function() {}, catEndingX, catEndingY, catEndingX, catEndingY, 0,Math.PI/2-xyAngle,time/2)
 	}
 	this.trapGenerator = function() {
 		if (this.trip != this.lastTrip) {
 			this.lastTrip = this.trip
-			var part=rndc(2)
+			var part = rndc(2)
 			for (var i = 0; i < part; i++) {
-				this.trap.push([rndf(Game.width/part)+i*Math.floor(Game.width/part)+ Game.width * this.trip, 10 * rndc(1 + Math.min(10, this.trip))])
+				this.trap.push([rndf(Game.width / part) + i * Math.floor(Game.width / part) + Game.width * this.trip, 10 * rndc(1 + Math.min(10, this.trip))])
 			}
 		}
 	}
@@ -178,8 +201,8 @@ var Lift = function() {
 	}
 	this.drawTrap = function(ctx) {
 		ctx.save()
-		ctx.fillStyle = "red"
-		ctx.textAlign = "left"
+		//ctx.fillStyle = "red"
+		//ctx.textAlign = "left"
 		ctx.lineWidth = 5
 		ctx.strokeStyle = "red"
 		for (var i = 0, length = this.trap.length; i < length; i++) {
@@ -187,24 +210,24 @@ var Lift = function() {
 			var trapX = Game.width + this.trap[i][0] - this.distance
 			if (trapX < this.visibleWidth) {
 				var visibleTrapWidth = Math.min(this.trap[i][1], this.visibleWidth - trapX)
-				ctx.moveTo(trapX, trapX * xyRatio + this.liftLeftHeight)
-				ctx.lineTo(trapX + visibleTrapWidth, (trapX + visibleTrapWidth) * xyRatio + this.liftLeftHeight)
+				ctx.moveTo(trapX, trapX * xyRatio + this.liftLeftHeight+5)
+				ctx.lineTo(trapX + visibleTrapWidth, (trapX + visibleTrapWidth) * xyRatio + this.liftLeftHeight+5)
 				ctx.stroke()
-				ctx.fillText("坑", trapX, trapX * xyRatio + this.liftLeftHeight - 10)
+				//ctx.fillText("坑", trapX, trapX * xyRatio + this.liftLeftHeight - 10)
 			}
 		}
 		ctx.restore()
 	}
 	this.drawCat = function(ctx) {
 		ctx.save()
-		ctx.fillStyle = "black"
+		ctx.fillStyle = this.catColor
 		ctx.textAlign = "center"
 		ctx.lineWidth = 5
-		ctx.strokeStyle = "black"
+		ctx.strokeStyle = this.catColor
 		ctx.beginPath()
 		ctx.moveTo(this.catX, this.catY)
-		ctx.lineTo(this.catX, this.catY - 40)
-		ctx.fillText("猫", this.catX, this.catY - 40)
+		ctx.lineTo(this.catX, this.catY - this.catH)
+		ctx.fillText("猫", this.catX, this.catY - this.catH)
 		ctx.stroke()
 		ctx.restore()
 	}
@@ -224,17 +247,19 @@ var Lift = function() {
 		ctx.textAlign = "center"
 		ctx.font = base_font["22b"]
 			//ctx.fillText("dist:" + Math.round(this.distance) + ";trip:" + this.trip + ";trap:" + this.trap, 0, 20)
-		ctx.fillText("神经猫2：电梯跳绳" + this.jumpUpCount + "次", 0.5 * Game.width, 0.1 * Game.height)
-		ctx.lineWidth = 2
+		ctx.fillText("神经猫2：电梯蹦蹦床" + this.jumpUpCount + "次", 0.5 * Game.width, 0.1 * Game.height)
+		ctx.lineWidth = 5
 		ctx.beginPath()
 		ctx.moveTo(0, this.liftLeftHeight)
 		ctx.lineTo(Game.width, this.liftLeftHeight + xyRatio * Game.width)
-		ctx.strokeStyle = "grey"
+		ctx.strokeStyle = this.liftColor
 		ctx.stroke()
 		ctx.restore();
 	}
 	this.step = function(dt) {
 		if (!this.inPause) {
+			this.allTime+=dt/1000
+			this.avgs=Math.floor(this.jumpUpCount/this.allTime)
 			this.distance += speedX * dt / 1000;
 			this.trip = Math.floor(this.distance / Game.width)
 			this.trapGenerator()
@@ -243,7 +268,7 @@ var Lift = function() {
 			this.checkCoordinate(dt)
 				//this.restoreEnergy(dt)
 			this.checkFreeze(dt)
-				//this.declineRange(dt)
+			this.declineRange(dt)
 			this.adjustVisible()
 			this.checkAccident()
 			if (this.guideOn) {
@@ -259,7 +284,7 @@ var Lift = function() {
 		this.drawCat(ctx)
 		ctx.restore()
 		this.drawTrap(ctx)
-		this.drawEnergyBar(ctx)
+		//this.drawEnergyBar(ctx)
 		this.drawRange(ctx)
 	}
 }

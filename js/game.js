@@ -1,8 +1,8 @@
 var Game = new function() {
 	//游戏原始尺寸
 	var fullFill = PC ? false : true;
-	var ORIGINAL_WIDTH = PC?480:window.innerWidth/2;
-	var ORIGINAL_HEIGHT =PC?320:window.innerHeight/2;
+	var ORIGINAL_WIDTH = PC?480:window.innerWidth/3;
+	var ORIGINAL_HEIGHT =PC?320:window.innerHeight/3;
 	isAPP = false;
 	base_font = {
 		12: 12  + "px bangers", //小
@@ -20,7 +20,7 @@ var Game = new function() {
 		this.width = ORIGINAL_WIDTH;
 		this.height = ORIGINAL_HEIGHT;
 		
-		this.scale=PC?1:2
+		this.scale=PC?1:3
 		this.canvas = document.createElement("canvas");
 		document.body.appendChild(this.canvas);
 		this.canvas.width = this.width*this.scale;
