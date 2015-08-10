@@ -1,5 +1,5 @@
 var Lift = function() {
-	var speedX = 25
+	this.liftSpeed = 20
 	var mallLogos = ["华润万家", "屈臣氏", "正佳广场", "中信大厦", "万达广场"]
 	var xyRatio = 0.25
 	var xyAngle=Math.atan(xyRatio)
@@ -175,7 +175,7 @@ var Lift = function() {
 		var realDistance =this.inJumpCross*Math.min(this.catH, Math.abs(distance))
 		var catEndingX=this.catX+realDistance
 		var catEndingY=this.liftLeftHeight + xyRatio * catEndingX
-//		this.catH-= realDistance
+		this.catH-= Math.abs(realDistance/2) 
 		this.jcSpeed = 2 * realDistance / time
 		this.jcAcc = -this.jcSpeed / time
 		this.catJumpUp(time,height)
@@ -185,6 +185,7 @@ var Lift = function() {
 	this.trapGenerator = function() {
 		if (this.trip != this.lastTrip) {
 			this.lastTrip = this.trip
+			this.liftSpeed+=2
 			var part = rndc(2)
 			for (var i = 0; i < part; i++) {
 				this.trap.push([rndf(Game.width / part) + i * Math.floor(Game.width / part) + Game.width * this.trip, 10 * rndc(1 + Math.min(10, this.trip))])
@@ -261,7 +262,7 @@ var Lift = function() {
 		if (!this.inPause) {
 			this.allTime+=dt/1000
 			this.avgs=Math.floor(this.jumpUpCount/this.allTime)
-			this.distance += speedX * dt / 1000;
+			this.distance += this.liftSpeed * dt / 1000;
 			this.trip = Math.floor(this.distance / Game.width)
 			this.trapGenerator()
 			this.trapUnquip()
