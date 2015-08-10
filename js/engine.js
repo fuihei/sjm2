@@ -58,7 +58,7 @@ var Lift = function() {
 		else if (this.guideCount > 3000 && this.guideTimes == 1) {
 			this.inPause = true
 			this.guideTimes++
-				confirm("点击电梯，开始左右跳") ? this.cancelPause() : this.cancelPause()
+				confirm("点击神经猫两侧，开始左右跳") ? this.cancelPause() : this.cancelPause()
 		}
 	}
 	this.checkAccident = function() {
@@ -134,8 +134,8 @@ var Lift = function() {
 	}
 	this.checkJump = function() {
 		if (Game.touch.touched) {
-			var height = this.catTween.nowFrame ? Math.floor(30 * this.catTween.plusAllFrame / this.catTween.nowFrame) : 30
-			if (Game.touch.X >= this.catX - this.catTouch.left && Game.touch.X <= this.catX + this.catTouch.right && Game.touch.Y <= this.catY + this.catTouch.down && Game.touch.Y >= this.catY - this.catH-this.catTouch.up) {
+			var height = this.catTween.nowFrame ? Math.floor(this.catH * this.catTween.plusAllFrame / this.catTween.nowFrame) : this.catH
+			if (Game.touch.X >= this.catX - this.catTouch.left && Game.touch.X <= this.catX + this.catTouch.right) {
 				this.catColor=pressColor
 				setTimeout("lift.catColor=catColor",200)
 				if (this.catTween.nowFrame >= 0.5 * this.catTween.plusAllFrame || !this.catTween.nowFrame) {
@@ -178,8 +178,9 @@ var Lift = function() {
 //		this.catH-= realDistance
 		this.jcSpeed = 2 * realDistance / time
 		this.jcAcc = -this.jcSpeed / time
-		Tween.create.call(this.catTween, "rotate", 1, false, function() {}, this.catX, this.catY, this.catX, this.catY, 0,Math.PI/2+ xyAngle,time/2)
-		Tween.create.call(this.catTween, "rotate", 1, true, function() {}, catEndingX, catEndingY, catEndingX, catEndingY, 0,Math.PI/2-xyAngle,time/2)
+		this.catJumpUp(time,height)
+		//Tween.create.call(this.catTween, "rotate", 1, false, function() {}, this.catX, this.catY, this.catX, this.catY, 0,Math.PI/2+ xyAngle,time/2)
+		//Tween.create.call(this.catTween, "rotate", 1, true, function() {}, catEndingX, catEndingY, catEndingX, catEndingY, 0,Math.PI/2-xyAngle,time/2)
 	}
 	this.trapGenerator = function() {
 		if (this.trip != this.lastTrip) {
@@ -227,7 +228,7 @@ var Lift = function() {
 		ctx.beginPath()
 		ctx.moveTo(this.catX, this.catY)
 		ctx.lineTo(this.catX, this.catY - this.catH)
-		ctx.fillText("猫", this.catX, this.catY - this.catH)
+		ctx.fillText("猫", this.catX, this.catY - this.catH*(1-this.inFreeze))
 		ctx.stroke()
 		ctx.restore()
 	}
