@@ -2,62 +2,65 @@ var Lift = function() {
 	var mallLogos = ["华润万家", "屈臣氏", "正佳广场", "中信大厦", "万达广场"]
 	var pressColor = "red"
 	var self = this
-	this.lift = {
-		speed: 20,
-		distance: 0,
-		trip: 0,
-		lastTrip: -1,
-		level: 0,
-		levelNeedTrips: 5,
-		speedPlusByTrip: 2,
-		startHeight: 0.8 * Game.height,
-		ratio: -0.25,
-		angle: Math.atan(-0.25),
-		baseColor: "grey",
-		color: "grey"
+	this.initial = function() {
+		this.lift = {
+			speed: 20,
+			distance: 0,
+			trip: 0,
+			lastTrip: -1,
+			level: 0,
+			levelNeedTrips: 5,
+			speedPlusByTrip: 2,
+			startHeight: 0.8 * Game.height,
+			ratio: -0.25,
+			angle: Math.atan(-0.25),
+			baseColor: "grey",
+			color: "grey"
+		}
+		this.cat = {
+			x: 0.2 * Game.width,
+			y: self.lift.startHeight + self.lift.ratio * 0.2 * Game.width,
+			tween: {},
+			level: 0,
+			levelByTimes: [10, 30, 60, 100, 150, 210, 280, 360, 450, 550, 660, 780, 910, 1050, 1200, 1360, 1530, 1710],
+			baseColor: "black",
+			color: "black"
+		}
+		this.levelBar = {
+			length: 20,
+			at: 0
+		}
+		this.catHeight = {
+			now: 25,
+			min: 25,
+			max: 100,
+			reduceByTime: 5,
+			plusByTime: 5,
+			plusByJump: 5,
+			reducePercentByJump: 0.5
+		}
+		this.catJump = {
+			upTime: 1,
+			crossTime: 1,
+			upTimes: 0,
+			freezeTimer: 0,
+			crossDirection: 0,
+			floatFrame: 0
+		}
+		this.catTouch = {
+			left: 15,
+			right: 15
+		}
+		this.trap = {
+			traps: [
+				[-0.5 * Game.width, 5]
+			],
+			lengthByTrip: 5,
+			maxToTrips: 20,
+			amountOfTrip: 2
+		}
 	}
-	this.cat = {
-		x: 0.2 * Game.width,
-		y: self.lift.startHeight + self.lift.ratio * 0.2 * Game.width,
-		tween: {},
-		level: 0,
-		levelByTimes: [10, 30, 60, 100, 150, 210, 280, 360, 450, 550, 660, 780, 910, 1050, 1200, 1360, 1530, 1710],
-		baseColor: "black",
-		color: "black"
-	}
-	this.levelBar = {
-		length: 20,
-		at: 0
-	}
-	this.catHeight = {
-		now: 25,
-		min: 25,
-		max: 100,
-		reduceByTime: 5,
-		plusByTime: 5,
-		plusByJump: 5,
-		reducePercentByJump: 0.5
-	}
-	this.catJump = {
-		upTime: 1,
-		crossTime: 1,
-		upTimes: 0,
-		freezeTimer: 0,
-		crossDirection: 0,
-		floatFrame: 0
-	}
-	this.catTouch = {
-		left: 15,
-		right: 15
-	}
-	this.trap = {
-		traps: [
-			[-0.5 * Game.width, 5]
-		],
-		lengthByTrip: 5,
-		maxToTrips: 20,
-		amountOfTrip: 2
-	}
+	this.initial()
 	this.guide = {
 		on: list.played <= 2 ? true : false,
 		times: 0,
@@ -65,9 +68,10 @@ var Lift = function() {
 	}
 	this.inPause = false
 	this.continueGame = function() {
-		Tween.clear.call(this.cat.tween)
-		this.catJump.upTimes = 0
-		this.trap.traps.splice(0, 1)
+//		Tween.clear.call(this.cat.tween)
+//		this.catJump.upTimes = 0
+//		this.trap.traps.splice(0, 1)
+		this.initial()
 		this.cancelPause()
 	}
 	this.cancelPause = function() {
@@ -106,21 +110,21 @@ var Lift = function() {
 			var catBottom = this.cat.y - jumpHeight
 			if ((this.cat.x >= spriteX - 0.5 * this.sprite.box) && (this.cat.x <= spriteX + 0.5 * this.sprite.box) && (catTop <= spriteY + 0.5 * this.sprite.box) && (catBottom >= spriteY - 0.5 * this.sprite.box)) {
 				if (this.sprite.sprites[i][2] == 0) {
-					this.sprite.effect=0
+					this.sprite.effect = 0
 					this.catJump.upTime = 0.5
 					this.catJump.crossTime = 0.5
 					setTimeout("lift.catJump.upTime=1", 5000)
 					setTimeout("lift.catJump.crossTime=1", 5000)
 					setTimeout("lift.sprite.effect=-1", 5000)
 				} else if (this.sprite.sprites[i][2] == 1) {
-					this.sprite.effect=1
+					this.sprite.effect = 1
 					this.catJump.upTime = 2
 					this.catJump.crossTime = 2
 					setTimeout("lift.catJump.upTime=1", 5000)
 					setTimeout("lift.catJump.crossTime=1", 5000)
 					setTimeout("lift.sprite.effect=-1", 5000)
 				} else if (this.sprite.sprites[i][2] == 2) {
-					this.sprite.effect=2
+					this.sprite.effect = 2
 					this.catJump.floatFrame = 5
 					setTimeout("lift.catJump.floatFrame=0", 5000)
 					setTimeout("lift.sprite.effect=-1", 5000)
@@ -223,7 +227,7 @@ var Lift = function() {
 		sprites: [],
 		box: 20,
 		amount: 3,
-		effect:-1
+		effect: -1
 	}
 	this.spriteGenerator = function() {
 		var part = rndc(this.sprite.amount)
@@ -324,7 +328,7 @@ var Lift = function() {
 		ctx.beginPath()
 		ctx.moveTo(this.cat.x, this.cat.y)
 		ctx.lineTo(this.cat.x, this.cat.y - this.catHeight.now)
-		ctx.fillText(this.sprite.effect==2?"浮":(this.sprite.effect==1?"缓":(this.sprite.effect==0?"快":"猫")), this.cat.x, this.cat.y - this.catHeight.now * (1 - this.catJump.freezeTimer))
+		ctx.fillText(this.sprite.effect == 2 ? "浮" : (this.sprite.effect == 1 ? "缓" : (this.sprite.effect == 0 ? "快" : "猫")), this.cat.x, this.cat.y - this.catHeight.now * (1 - this.catJump.freezeTimer))
 		ctx.stroke()
 		ctx.restore()
 	}
