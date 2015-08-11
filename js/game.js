@@ -1,32 +1,39 @@
 var Game = new function() {
-	//游戏原始尺寸
-	var fullFill = PC ? false : true;
-	var ORIGINAL_WIDTH = PC?480:window.innerWidth/3;
-	var ORIGINAL_HEIGHT =PC?320:window.innerHeight/3;
+	var ORIGINAL_WIDTH = 320;
+	var ORIGINAL_HEIGHT = 480;
 	isAPP = false;
 	base_font = {
-		12: 12  + "px bangers", //小
-		14: 14  + "px bangers", //中
-		15: 15  + "px bangers",
-		17: 17  + "px bangers", //大
-		"12b": "bold " + 12  + "px bangers",
-		"14b": "bold " + 14  + "px bangers",
-		"15b": "bold " + 15  + "px bangers", //按键专用
-		"17b": "bold " + 17  + "px bangers", //成就标题专用
-		"20b": "bold " + 20  + "px bangers", //皇冠符号专用
-		"22b": "bold " + 22  + "px bangers", //游戏标题专用
+		12: 12 + "px bangers", //小
+		14: 14 + "px bangers", //中
+		15: 15 + "px bangers",
+		17: 17 + "px bangers", //大
+		"12b": "bold " + 12 + "px bangers",
+		"14b": "bold " + 14 + "px bangers",
+		"15b": "bold " + 15 + "px bangers", //按键专用
+		"17b": "bold " + 17 + "px bangers", //成就标题专用
+		"20b": "bold " + 20 + "px bangers", //皇冠符号专用
+		"22b": "bold " + 22 + "px bangers", //游戏标题专用
 	}
 	this.initial = function(callNext) {
-		this.width = ORIGINAL_WIDTH;
-		this.height = ORIGINAL_HEIGHT;
-		
-		this.scale=PC?1:3
+		this.innerWidth = window.innerWidth;
+		this.innerHeight = window.innerHeight;
+
+		if (!PC && this.innerHeight < this.innerWidth) {
+			alert(CN ? "本游戏竖屏体验最佳" : "this game displays in portrait best");
+			var screenMax = Math.max(window.screen.width, window.screen.height);
+			var screenMin = Math.min(window.screen.width, window.screen.height);
+			this.innerHeight = this.innerWidth * (0.9 * screenMax / screenMin);
+		}
+		this.width = ORIGINAL_WIDTH
+		this.height = PC ? ORIGINAL_HEIGHT : Math.floor(ORIGINAL_WIDTH * this.innerHeight / this.innerWidth)
+
+		this.scale = PC ? 1 : this.innerWidth / this.width
 		this.canvas = document.createElement("canvas");
 		document.body.appendChild(this.canvas);
-		this.canvas.width = this.width*this.scale;
-		this.canvas.height = this.height*this.scale;
+		this.canvas.width = this.width * this.scale;
+		this.canvas.height = this.height * this.scale;
 		this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
-		this.ctx.scale(this.scale,this.scale)
+		this.ctx.scale(this.scale, this.scale)
 		this.layers = [];
 		this.addLayer = function(layer) {
 			Game.layers.push(layer);
@@ -48,32 +55,28 @@ var Game = new function() {
 			if (!PC) {
 				window.addEventListener("touchstart", function(e) {
 					e.preventDefault();
-					if (!Game.touch.touched) {
-						singleTouch = e.touches[0];
-						Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
-						Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
+					singleTouch = e.touches[0];
+					Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
+					Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
 
-						Game.touch.touched = true;
-						Game.touch.X = Game.touch.pageX/Game.scale;
-						Game.touch.Y = Game.touch.pageY/Game.scale;
-						Game.touch.pageX = null;
-						Game.touch.pageY = null;
-					}
+					Game.touch.touched = true;
+					Game.touch.X = Game.touch.pageX / Game.scale;
+					Game.touch.Y = Game.touch.pageY / Game.scale;
+					Game.touch.pageX = null;
+					Game.touch.pageY = null;
 				}, false)
 			} else {
 				window.addEventListener("mousedown", function(e) {
 					e.preventDefault();
 					singleTouch = e;
-					if (!Game.touch.touched) {
-						Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
-						Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
+					Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
+					Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
 
-						Game.touch.touched = true;
-						Game.touch.X = Game.touch.pageX/Game.scale;
-						Game.touch.Y = Game.touch.pageY/Game.scale;
-						Game.touch.pageX = null;
-						Game.touch.pageY = null;
-					}
+					Game.touch.touched = true;
+					Game.touch.X = Game.touch.pageX / Game.scale;
+					Game.touch.Y = Game.touch.pageY / Game.scale;
+					Game.touch.pageX = null;
+					Game.touch.pageY = null;
 				}, false)
 			}
 
@@ -96,6 +99,8 @@ var Game = new function() {
 		window.requestFrame(Game.loop);
 		callNext();
 	}
+	list = window.localStorage;
+	list.played=list.played?(parseInt(list.played)+1):1
 }
 var callLoadStage = function() {
 	backscene = new BackScene();
