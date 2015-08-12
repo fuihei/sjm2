@@ -1,5 +1,5 @@
 var Lift = function() {
-	var mallLogos = ["华润万家", "屈臣氏", "正佳广场", "中信大厦", "万达广场"]
+	var mallLogos = ["安良百货", "外滩广场", "甬温你懂的", "威虎饭店", "神经病院"]
 	var pressColor = "red"
 	var self = this
 	this.initial = function() {
@@ -99,8 +99,8 @@ var Lift = function() {
 				Tween.clear.call(this.cat.tween)
 				Tween.create.call(this.cat.tween, "translate", 1, false, function() {}, "linear", 0, 0, 0, Game.height - this.lift.startHeight, 1)
 				this.inPause = true
-				PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你乘坐神猫飞船跳了'+lift.catJump.upTimes+'次'+'，继续不') ? lift.continueGame() :''", 1000)
-				document.title = "你乘坐神猫" + (this.cat.level + 2) + "号飞船：电梯逃亡" + this.catJump.upTimes + "次"
+				PC ? setTimeout("lift.continueGame()", 1000) : setTimeout("confirm('你乘坐神经猫飞船逃回火星'+lift.catJump.upTimes+'次'+'，继续不') ? lift.continueGame() :''", 1000)
+				document.title = "我乘坐神经猫" + (this.cat.level + 2) + "号飞船逃回火星" + this.catJump.upTimes + "次，击败"+Math.round(this.catJump.upTimes/15)+"%的人，结果牺牲在"+this.lift.level + "F " + mallLogos[this.lift.trip % 5]
 			}
 		}
 	}
@@ -263,7 +263,7 @@ var Lift = function() {
 				this.lift.level++
 					if (this.lift.trip > 0) {
 						this.inPause = true
-						confirm("恭喜你，是否进入第" + this.lift.level + "关") ? this.cancelPause() : ""
+						confirm("恭喜你，是否进入第" + this.lift.level + "楼") ? this.cancelPause() : ""
 					}
 			}
 			this.lift.speed += this.lift.speedPlusByTrip
@@ -347,7 +347,7 @@ var Lift = function() {
 		ctx.textAlign = "center"
 		ctx.font = base_font["22b"]
 			//ctx.fillText("dist:" + Math.round(this.lift.distance) + ";trip:" + this.lift.trip + ";trap:" + this.trap.traps, 0, 20)
-		ctx.fillText("神经猫" + (this.cat.level + 2) + "号：电梯逃亡" + this.catJump.upTimes + "次", 0.5 * Game.width, 40)
+		ctx.fillText("神经猫" + (this.cat.level + 2) + "号：逃回火星" + this.catJump.upTimes + "次", 0.5 * Game.width, 40)
 		ctx.lineWidth = 5
 		ctx.beginPath()
 		ctx.moveTo(0, this.lift.startHeight)
