@@ -59,6 +59,12 @@ var Lift = function() {
 			maxToTrips: 20,
 			amountOfTrip: 2
 		}
+		this.sprite = {
+			sprites: [],
+			box: 20,
+			amount: 3,
+			effect: -1
+		}
 	}
 	this.initial()
 	this.guide = {
@@ -68,9 +74,9 @@ var Lift = function() {
 	}
 	this.inPause = false
 	this.continueGame = function() {
-//		Tween.clear.call(this.cat.tween)
-//		this.catJump.upTimes = 0
-//		this.trap.traps.splice(0, 1)
+		//		Tween.clear.call(this.cat.tween)
+		//		this.catJump.upTimes = 0
+		//		this.trap.traps.splice(0, 1)
 		this.initial()
 		this.cancelPause()
 	}
@@ -223,12 +229,6 @@ var Lift = function() {
 			//Tween.create.call(this.cat.tween, "rotate", 1, false, function() {}, this.cat.x, this.cat.y, this.cat.x, this.cat.y, 0,Math.PI/2+ this.lift.angle,time/2)
 			//Tween.create.call(this.cat.tween, "rotate", 1, true, function() {}, catEndingX, catEndingY, catEndingX, catEndingY, 0,Math.PI/2-this.lift.angle,time/2)
 	}
-	this.sprite = {
-		sprites: [],
-		box: 20,
-		amount: 3,
-		effect: -1
-	}
 	this.spriteGenerator = function() {
 		var part = rndc(this.sprite.amount)
 		for (var i = 0; i < 1; i++) {
@@ -299,7 +299,7 @@ var Lift = function() {
 				ctx.fillStyle = "grey"
 				ctx.fillRect(spriteX - 0.5 * this.sprite.box, spriteY - 0.5 * this.sprite.box, this.sprite.box, this.sprite.box)
 				ctx.fillStyle = "red"
-				ctx.fillText(this.sprite.sprites[i][2] == 0 ? "快" : (this.sprite.sprites[i][2] == 1 ? "缓" : "浮"), spriteX, spriteY + 0.5 * this.sprite.box)
+				ctx.fillText(this.sprite.sprites[i][2] == 0 ? "快" : (this.sprite.sprites[i][2] == 1 ? "缓" : "浮"), spriteX, spriteY + 0.4 * this.sprite.box)
 			}
 		}
 		ctx.restore()
