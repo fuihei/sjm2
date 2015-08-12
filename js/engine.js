@@ -68,7 +68,7 @@ var Lift = function() {
 	}
 	this.initial()
 	this.guide = {
-		on: list.played <= 2 ? true : false,
+		on: list.played <= 1 ? true : false,
 		times: 0,
 		timer: 0
 	}
