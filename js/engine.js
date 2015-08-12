@@ -263,9 +263,11 @@ var Lift = function() {
 		if (this.lift.trip != this.lift.lastTrip) {
 			this.lift.lastTrip = this.lift.trip
 			if (this.lift.trip % this.lift.levelNeedTrips == 0) {
-				this.inPause = true
 				this.lift.level++
-					PC ? this.cancelPause() : confirm("是否继续第" + this.lift.level + "关") ? this.cancelPause() : ""
+					if (this.lift.trip > 0) {
+						this.inPause = true
+						PC ? this.cancelPause() : confirm("恭喜你，是否进入第" + this.lift.level + "关") ? this.cancelPause() : ""
+					}
 			}
 			this.lift.speed += this.lift.speedPlusByTrip
 			this.trapGenerator()
