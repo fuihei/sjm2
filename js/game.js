@@ -16,7 +16,7 @@ var Game = new function() {
 	}
 	this.initial = function(callNext) {
 		this.innerWidth = window.innerWidth;
-		this.innerHeight = window.innerHeight;
+		this.innerHeight = window.innerHeight-(window.innerWidth<500?35:65);
 
 		if (!PC && this.innerHeight < this.innerWidth) {
 			alert(CN ? "本游戏竖屏体验最佳" : "this game displays in portrait best");
@@ -54,7 +54,7 @@ var Game = new function() {
 			var singleTouch;
 			if (!PC) {
 				window.addEventListener("touchstart", function(e) {
-					e.preventDefault();
+					//e.preventDefault();
 					singleTouch = e.touches[0];
 					Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
 					Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
@@ -67,7 +67,7 @@ var Game = new function() {
 				}, false)
 			} else {
 				window.addEventListener("mousedown", function(e) {
-					e.preventDefault();
+					//e.preventDefault();
 					singleTouch = e;
 					Game.touch.pageX = Math.round(singleTouch.pageX) - Game.canvas.getBoundingClientRect().left;
 					Game.touch.pageY = Math.round(singleTouch.pageY) - Game.canvas.getBoundingClientRect().top;
