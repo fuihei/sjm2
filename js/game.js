@@ -16,7 +16,7 @@ var Game = new function() {
 	}
 	this.initial = function(callNext) {
 		this.innerWidth = window.innerWidth;
-		this.innerHeight = window.innerHeight-(window.innerWidth<500?35:65);
+		this.innerHeight = window.innerHeight - (window.innerWidth < 500 ? 35 : 65);
 
 		if (!PC && this.innerHeight < this.innerWidth) {
 			alert(CN ? "本游戏竖屏体验最佳" : "this game displays in portrait best");
@@ -86,6 +86,7 @@ var Game = new function() {
 		loopInterval = 0;
 		this.loop = function(time) {
 			loopInterval = Math.round(time - loopLastTime);
+			loopInterval = loopInterval ? Math.min(loopInterval, 60) : 30
 			loopIntervalAvg = typeof(loopIntervalAvg) != "undefined" ? (loopIntervalAvg + loopInterval) / 2 : loopInterval;
 			for (var i = 0, len = Game.layers.length; i < len; i++) {
 				if (Game.layers[i]) {
@@ -100,7 +101,7 @@ var Game = new function() {
 		callNext();
 	}
 	list = window.localStorage;
-	list.played=list.played?(parseInt(list.played)+1):1
+	list.played = list.played ? (parseInt(list.played) + 1) : 1
 }
 var callLoadStage = function() {
 	backscene = new BackScene();

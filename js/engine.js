@@ -74,9 +74,6 @@ var Lift = function() {
 	}
 	this.inPause = false
 	this.continueGame = function() {
-		//		Tween.clear.call(this.cat.tween)
-		//		this.catJump.upTimes = 0
-		//		this.trap.traps.splice(0, 1)
 		this.initial()
 		this.cancelPause()
 	}
@@ -266,7 +263,7 @@ var Lift = function() {
 				this.lift.level++
 					if (this.lift.trip > 0) {
 						this.inPause = true
-						PC ? this.cancelPause() : confirm("恭喜你，是否进入第" + this.lift.level + "关") ? this.cancelPause() : ""
+						confirm("恭喜你，是否进入第" + this.lift.level + "关") ? this.cancelPause() : ""
 					}
 			}
 			this.lift.speed += this.lift.speedPlusByTrip
@@ -363,7 +360,6 @@ var Lift = function() {
 		if (!this.inPause) {
 			this.lift.distance += this.lift.speed * dt / 1000;
 			this.lift.trip = Math.floor(this.lift.distance / Game.width)
-
 			this.checkTrip()
 			this.checkPress()
 			this.checkCross(dt)
@@ -380,6 +376,8 @@ var Lift = function() {
 		this.drawLift(ctx)
 		this.drawMallLogos(ctx)
 		ctx.save()
+//		ctx.fillStyle="black"
+//		ctx.fillText(dt,100,100)
 		Tween.play.call(this.cat.tween)
 		this.drawCat(ctx)
 		ctx.restore()
